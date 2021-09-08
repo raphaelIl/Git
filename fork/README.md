@@ -74,7 +74,7 @@ upstream  https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git (push)
 upstream의 변경사항을 받아온다
 
 ```sh
-$ git pull --rebase
+$ git pull --rebase upstream master
 
 or
 
@@ -86,15 +86,14 @@ $ git rebase upstream/master  # rebase: local_master가 fetch로 가져온 upstr
 
 #### origin에 변경사항을 push하여 적용한다
 
-Rebase를 통해 현재 로컬의 Master 브랜치는 원본 upstream Master 브랜치로 변경이 되어있는 상태입니다.  
-이제 Fork한 원격 저장소도 원본 upstream Master 브랜치로 변경해야 합니다.
+Rebase를 통해 현재 로컬의 Master 브랜치는 원본 upstream Master 브랜치로 변경이 되어있는 상태  
+Fork한 원격 저장소(origin)도 원본 upstream Master 브랜치로 변경해야 합니다.
 
 ```sh
-$ git push origin master -f
+$ git push origin master (-f)
 ```
 
 ---
-
-### upstream의 변경사항이 확인되면
-
-IDE에서 `Git - Project Update - Rebase the current branch on top of the incoming changes` 하면 한방에 해결되는듯
+### fail
+~~upstream의 변경사항이 확인되면
+IDE에서 `Git - Project Update - Rebase the current branch on top of the incoming changes` 하면 한방에 해결되는듯~~
