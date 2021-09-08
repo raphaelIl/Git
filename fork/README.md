@@ -5,17 +5,18 @@
 - upstream: main(root, forked) repository
 - origin: fork한 나의 repository
 
-지금은 알고 있던 git flow가 아닌 fork를 사용하여 upstream를 보호하는 정책을 사용하고 있다.  
-fork한 프로젝트에서 이미 커밋을 하였는데 upstream에서 변경사항이 생겼다면 어떻게 적용할 것인가?  
 <br>
 
 ## 요구 사항
 
+지금은 알고 있던 git flow가 아닌 fork를 사용하여 upstream를 보호하는 정책을 사용하고 있다.  
+fork한 프로젝트에서 이미 커밋을 하였는데 upstream에서 변경사항이 생겼다면 어떻게 적용할 것인가?
+
 upstream의 커밋 히스토리와 나의 변경사항을 분리해서 git graph로 관리하고 싶었다.
 
-> [둘에 대한 개념(graph) 차이](https://www.jetbrains.com/help/pycharm/2021.2/sync-with-a-remote-repository.html#update)
+> [Update your project on pyCharm](https://www.jetbrains.com/help/pycharm/2021.2/sync-with-a-remote-repository.html#update)
 
-그러나 내가 진행한 방법은 다음과 같았다.
+그러나 내가 진행한 방법은 다음과 같았다. (실수)
 
 - `Merge the incoming changes into the current branch`
 
@@ -91,3 +92,9 @@ Rebase를 통해 현재 로컬의 Master 브랜치는 원본 upstream Master 브
 ```sh
 $ git push origin master -f
 ```
+
+---
+
+### upstream의 변경사항이 확인되면
+
+IDE에서 `Git - Project Update - Rebase the current branch on top of the incoming changes` 하면 한방에 해결되는듯
