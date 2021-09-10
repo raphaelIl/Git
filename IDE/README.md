@@ -8,10 +8,10 @@ vscode keymap을 기반으로 커스텀해서 자주 사용 중인 키맵을 정
 
 대입해보면 거의 다 된다.
 
-| Mac     | Window |
-| ------- | ------ |
-| command | ctrl   |
-| option  | alt    |
+| OS   | Mac     | Window |
+| ---- | ------- | ------ |
+| key1 | command | ctrl   |
+| key2 | option  | alt    |
 
 ### Code
 
@@ -26,23 +26,22 @@ vscode keymap을 기반으로 커스텀해서 자주 사용 중인 키맵을 정
 
   <br>
 
-- cmd + / : Comment with line comment
-- cmd + shift + / : Comment with block comment
+- cmd(ctrl) + / : Comment with line comment
+- cmd(ctrl) + option(alt) + / : Comment with block comment
 - ` : Move caret to next word
 - shift + ` : Move caret to previous word
 
   <br>
 
-- cmd(ctrl) + option(alt) + I : Auto-Indent Lines
-- cmd(ctrl) + option(alt) + B: Go to class
-- cmd(ctrl) + option(alt) + B: Go to File
+- ctrl + alt + I : Auto-Indent Lines
+- cmd(ctrl) + option(alt) + B : Go to class
+- cmd(ctrl) + option(alt) + B : Go to File
 
   - 일부러 class or file로 이동하게끔 2개 커맨드가 같음
 
   <br>
 
-- cmd(ctrl) + P: view parameter info
-
+- ctrl + P: view parameter info
 - ctrl + enter: code generate (Getters, Setters, Constructors, HashCode/equals, toString)
 
 <br>
@@ -62,5 +61,5 @@ vscode keymap을 기반으로 커스텀해서 자주 사용 중인 키맵을 정
 
 ### Editor Actions
 
-- cmd(ctrl) + `+` : ,Increase Font Size
-- cmd(ctrl) + `-` : Decrease Font Size
+- cmd(ctrl) + `+(=)` : Increase Font Size
+- cmd(ctrl) + `-(-)` : Decrease Font Size
