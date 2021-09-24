@@ -1,41 +1,47 @@
-## fork_sync에 관해서...
-
-### Glossary
-
-- upstream: main(root, forked) repository
-- origin: fork한 나의 repository
+## Distributed Workflows
+https://git-scm.com/book/ko/v2/%EB%B6%84%EC%82%B0-%ED%99%98%EA%B2%BD%EC%97%90%EC%84%9C%EC%9D%98-Git-%EB%B6%84%EC%82%B0-%ED%99%98%EA%B2%BD%EC%97%90%EC%84%9C%EC%9D%98-%EC%9B%8C%ED%81%AC%ED%94%8C%EB%A1%9C 중  
+우린 `Integration-Manager 워크플로`에 근접하게 사용하고 있지 않나 하는 생각
 
 <br>
 
-## 요구 사항
+### Glossary
+
+- upstream: main(blessed, root, forked) repository
+- origin: fork한 나의 working repository
+
+<br>
+
+### 요구 사항
 
 지금은 알고 있던 git flow가 아닌 fork를 사용하여 upstream를 보호하는 정책을 사용하고 있다.  
-fork한 프로젝트에서 이미 커밋을 하였는데 upstream에서 변경사항이 생겼다면 어떻게 적용할 것인가?
-
-upstream의 커밋 히스토리와 나의 변경사항을 분리해서 git graph로 관리하고 싶었다.
-
-> [Update your project on pyCharm](https://www.jetbrains.com/help/pycharm/2021.2/sync-with-a-remote-repository.html#update)
-
-그러나 내가 진행한 방법은 다음과 같았다. (실수)
-
-- `Merge the incoming changes into the current branch`
-
-원하는 모습은 `rebase`를 사용하는게 맞았다.
-
-- `Rebase the current branch on top of the incoming changes`
+fork한 프로젝트에서 이미 커밋을 하였는데 upstream에서 변경사항이 생겼다면 어떻게 적용할 것인가?  
+**upstream의 커밋 히스토리와 나의 변경사항을 분리해서 git graph로 관리하고 싶었다.**  
+~~> [Update your project on pyCharm](https://www.jetbrains.com/help/pycharm/2021.2/sync-with-a-remote-repository.html#update)~~  
+~~그러나 내가 진행한 방법은 다음과 같았다. (실수)~~  
+~~- `Merge the incoming changes into the current branch`~~  
+~~원하는 모습은 `rebase`를 사용하는게 맞았다.~~  
+~~- `Rebase the current branch on top of the incoming changes`~~
   > Rebase를 하든지, Merge를 하든지 최종 결과물은 같고 커밋 히스토리만 다르다는 것이 중요하다.  
   > Rebase 의 경우는 브랜치의 변경사항을 순서대로 다른 브랜치에 적용하면서 합치고  
   > Merge 의 경우는 두 브랜치의 최종결과만을 가지고 합친다.
 
 <br>
 
-## Git Flow
+**결론**
+```sh
+$ git pull --rebase upstream master
+```
+
+<br>
+
+---
+### Git Flow
 
 - https://guides.github.com/introduction/flow/
 - https://techblog.woowahan.com/2553/
   <br>
 
-## Rebase가 뭔가요?
+### Rebase가 뭔가요?
 
 - https://git-scm.com/book/ko/v2/Git-%EB%B8%8C%EB%9E%9C%EC%B9%98-Rebase-%ED%95%98%EA%B8%B0
 
@@ -92,6 +98,8 @@ Fork한 원격 저장소(origin)도 원본 upstream Master 브랜치로 변경�
 ```sh
 $ git push origin master (-f)
 ```
+
+<br>
 
 ---
 ### fail
