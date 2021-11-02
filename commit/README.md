@@ -16,7 +16,7 @@ git reset HEAD (specific_file)
 origin에 push하기전 커밋을 취소 한다면
 reset 옵션
 * soft : index 보존(add한 상태, staged 상태), 워킹 디렉터리의 파일 보존. 즉 모두 보존.
-* mixed : index 취소(add하기 전 상태, unstaged 상태), 워킹 디렉터리의 파일 보존 (기본 옵션)
+* mixed **(기본 옵션)**: index 취소(add하기 전 상태, unstaged 상태), 워킹 디렉터리의 파일 보존 
 * hard : index 취소(add하기 전 상태, unstaged 상태), 워킹 디렉터리의 파일 삭제. 즉 모두 취소.
 ```sh
 # commit을 취소하고 해당 파일들은 staged 상태로 워킹 디렉터리에 보존
