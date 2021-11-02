@@ -64,3 +64,13 @@ vscode keymap을 기반으로 커스텀해서 자주 사용 중인 키맵을 정
 
 - cmd(ctrl) + `+(=)` : Increase Font Size
 - cmd(ctrl) + `-(-)` : Decrease Font Size
+
+<br>
+
+### githubCopilot
+(vscode도 동일하게 맞춤, keybinding에서)
+
+- `alt + [` : Copilot Show Previous Completions
+- `alt + ]` : Copilot Show Next Completions
+- `alt + enter` : Open Github Copilot (선택지 10개정도 보여줌)
+- `alt + \` : Copilot Show Completions
