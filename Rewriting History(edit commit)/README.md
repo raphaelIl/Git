@@ -2,7 +2,7 @@
 
 당연히 origin에 올라간 커밋을 변경할때는 force push 할 각오를 해야한다.  
 앵간하면 로컬에있는 커밋만을 변경하길 바란다.  
-`git log --pretty`로 이쁘게 로그를 확인할 수 있다.  
+`git log --pretty=oneline`로 이쁘게 로그를 확인할 수 있다.  
 <br>
 
 **_기본 컨셉: rebase interactive editor를 열고 이후 커맨드를 사용해서 조작한다._**
