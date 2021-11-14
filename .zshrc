@@ -2,8 +2,11 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 export VSCODE='/Applications/Visual Studio Code.app/Contents/Resources/app/bin'
 
+# In WSL
+# export VSCODE='/mnt/c/Program Files/Microsoft VS Code/bin'
+
 # setting to GO Language
-export GOPATH='/Users/raphael/Desktop/raphaelCode/go_story'
+# export GOPATH='/Users/raphael/Desktop/raphaelCode/go_story'
 
 # add PATH, $GOPATH, vsCode
 export PATH="$PATH:$HOME/bin:$GOPATH:$VSCODE"
