@@ -127,3 +127,7 @@ complete -F __start_kubectl k
 
 # autoCompletion aws on zsh
 complete -C '/usr/local/bin/aws_completer' aws
+
+# autoCompletion terraform on zsh
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /usr/bin/terraform terraform
