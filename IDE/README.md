@@ -28,9 +28,11 @@ vscode keymap을 기반으로 커스텀해서 자주 사용 중인 키맵을 정
   <br>
 
 - cmd(ctrl) + / : Comment with line comment
-- cmd(ctrl) + option(alt) + / : Comment with block comment
-- ` : Move caret to next word
-- shift + ` : Move caret to previous word
+- cmd(ctrl) + option(alt) + / : Comment with block comment  
+  <br>
+
+- option(alt) + <- : Move caret to Previous(next ->) word
+- option(alt) + cmd(ctrl) + <- : Move caret to Previous(next ->) word in Different "CamelHumps" Mode
 
   <br>
 
