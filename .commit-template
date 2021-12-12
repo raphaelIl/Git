@@ -1,6 +1,15 @@
 # <type>: <subject>
 ##### Subject 50 characters ################# -> |
+# 커밋의 제목만큼은 명령형으로 작성하자
+# 부담스럽다면 그냥 영어로 쓰는것도 방법
+# 아래 문장을 대입했을때 명령형이 아니라면 부자연스럽다
 
+# If applied, this commit will {Subject}
+# ex. If applied, this commit will refactor subsystem X for readability
+# ex2. If applied, this commit will update getting started documentation
+# ex3. If applied, this commit will remove deprecated methods
+# ex4. If applied, this commit will release version 1.0.0
+# ex5. If applied, this commit will merge pull request #123 from user/branch
 
 # Body Message
 ######## Body 72 characters ####################################### -> |
@@ -8,9 +17,10 @@
 # Issue Tracker Number or URL
 
 # --- COMMIT END ---
+
 # Type can be
 #   feat    : new feature
-#   fix     : bug fix
+#   fix      : bug fix
 #   refactor: refactoring production code
 #   style   : formatting, missing semi colons, etc; no code change
 #   docs    : changes to documentation
@@ -19,6 +29,7 @@
 #   chore   : updating grunt tasks etc
 #             no production code change
 # ------------------
+
 # Remember me ~
 #   Capitalize the subject line
 #     제목줄은 대문자로 시작한다.
@@ -33,3 +44,4 @@
 #   Can use multiple lines with "-" for bullet points in body
 #     본문에 목록을 나타낼때는 "-"로 시작한다.
 # ------------------
+# https://item4.blog/2016-10-31/How-to-Write-a-Git-Commit-Message
