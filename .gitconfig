@@ -1,0 +1,11 @@
+[user]
+# 	email = xxx
+	name = raphael9292
+# 	signingkey = xxx
+[commit]
+	gpgsign = true
+	template = /Users/raphael/.commit-template
+[gpg]
+	program = gpg
+[pull]
+	rebase = true
