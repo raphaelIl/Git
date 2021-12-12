@@ -1,22 +1,32 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # For EDITOR
-export VSCODE='/mnt/c/Program Files/Microsoft VS Code/bin'
-export IDEA='/mnt/c/Program Files/JetBrains/IntelliJ IDEA 2021.2.1/bin'
+export VSCODE='/Applications/Visual Studio Code.app/Contents/Resources/app/bin'
+
+# on WSL
+# export VSCODE='/mnt/c/Program Files/Microsoft VS Code/bin'
+# export IDEA='/mnt/c/Program Files/JetBrains/IntelliJ IDEA 2021.2.1/bin'
 
 # If you come from bash you might have to change your $PATH.
 # add PATH, $GOPATH, vsCode intellij
-export PATH="$PATH:$HOME/bin:$VSCODE:$IDEA"
+export PATH="$PATH:$HOME/bin:$VSCODE"
+ZSH_DISABLE_COMPFIX="true"
+HISTTIMEFORMAT="[%y/%m/%d %T] "
 
 # Path to your oh-my-zsh installation.
-export ZSH="/home/raphael/.oh-my-zsh"
-ZSH_DISABLE_COMPFIX="true"
-
-HISTTIMEFORMAT="[%y/%m/%d %T] "
+export ZSH="/Users/raphael/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="dracula"
+# ZSH_THEME="dracula"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -82,8 +92,10 @@ plugins=(
   git
   zsh-syntax-highlighting
   zsh-autosuggestions
+  fzf
+  fasd
+  asdf
 )
-
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
@@ -109,25 +121,30 @@ source $ZSH/oh-my-zsh.sh
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
 alias ll='ls -alh'
 alias k='kubectl'
 alias e='exit'
 alias c='clear'
-
-# alias saml2aws on windows
-# https://github.com/Versent/saml2aws
-alias saml2aws='/mnt/c/Users/Administrator/Desktop/self_study/saml2aws_2.33.0_windows_amd64/saml2aws.exe'
+# alias cat='bat'
 
 # autoCompletion kubectl on zsh
 source <(kubectl completion zsh)
 complete -F __start_kubectl k
 
-# https://github.com/junegunn/fzf#using-homebrew
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
 # autoCompletion aws on zsh
 complete -C '/usr/local/bin/aws_completer' aws
 
+# asdf
+. /opt/homebrew/opt/asdf/libexec/asdf.sh
+
 # autoCompletion terraform on zsh
 autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C /usr/bin/terraform terraform
+complete -o nospace -C /opt/homebrew/bin/terraform terraform
+
+# autoCompletion saml2aws on zsh
+eval "$(saml2aws --completion-script-zsh)"
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
