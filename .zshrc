@@ -16,7 +16,6 @@ export VSCODE='/Applications/Visual Studio Code.app/Contents/Resources/app/bin'
 # add PATH, $GOPATH, vsCode intellij
 export PATH="$PATH:$HOME/bin:$VSCODE"
 ZSH_DISABLE_COMPFIX="true"
-HISTTIMEFORMAT="[%y/%m/%d %T] "
 
 # Path to your oh-my-zsh installation.
 export ZSH="/Users/raphael/.oh-my-zsh"
@@ -79,6 +78,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # or set a custom format using the strftime function format specifications,
 # see 'man strftime' for details.
 # HIST_STAMPS="mm/dd/yyyy"
+HIST_STAMPS="yyyy-mm-dd"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
