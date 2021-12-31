@@ -5,16 +5,17 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# For EDITOR
+# For Development
 export VSCODE='/Applications/Visual Studio Code.app/Contents/Resources/app/bin'
+export GOPATH='/Users/raphael/GoProjects:/Users/raphael/GoProjects/go1.16.12/bin'
 
-# on WSL
+# On WSL
 # export VSCODE='/mnt/c/Program Files/Microsoft VS Code/bin'
 # export IDEA='/mnt/c/Program Files/JetBrains/IntelliJ IDEA 2021.2.1/bin'
 
 # If you come from bash you might have to change your $PATH.
 # add PATH, $GOPATH, vsCode intellij
-export PATH="$PATH:$HOME/bin:$VSCODE"
+export PATH="$PATH:$HOME/bin:$VSCODE:$GOPATH"
 ZSH_DISABLE_COMPFIX="true"
 
 # Path to your oh-my-zsh installation.
@@ -77,7 +78,6 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # or set a custom format using the strftime function format specifications,
 # see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
 HIST_STAMPS="yyyy-mm-dd"
 
 # Would you like to use another custom folder than $ZSH/custom?
@@ -127,6 +127,7 @@ alias ll='ls -alh'
 alias k='kubectl'
 alias e='exit'
 alias c='clear'
+alias tf='terraform'
 # alias cat='bat'
 
 # autoCompletion kubectl on zsh
