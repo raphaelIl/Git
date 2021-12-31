@@ -1,6 +1,6 @@
 [user]
 # 	email = xxx
-	name = raphael9292
+	name = raphael
 # 	signingkey = xxx
 [commit]
 	gpgsign = true
