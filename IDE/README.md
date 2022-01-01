@@ -10,7 +10,7 @@ vscode keymap을 기반으로 커스텀해서 자주 사용 중인 키맵을 정
 대입해보면 거의 다 된다.
 
 | OS   | Mac     | Window |
-| ---- | ------- | ------ |
+|------|---------|--------|
 | key1 | command | ctrl   |
 | key2 | option  | alt    |
 
