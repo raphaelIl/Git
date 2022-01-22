@@ -20,7 +20,6 @@ vscode keymap을 기반으로 커스텀해서 자주 사용 중인 키맵을 정
 - ctrl + shift + space : Smart Code Completion
   - (Type-matching: filters the list of methodsand variables by expected type)
 - ctrl + shift + enter : Complete statement  
-  <br>
 - **cmd(ctrl) + option(alt) + T : Surround with ...**
 
   - 다음으로 코드 감싸기 (ifElse, tryCatch, for, synchronized, ...)
@@ -33,46 +32,40 @@ vscode keymap을 기반으로 커스텀해서 자주 사용 중인 키맵을 정
 
 - option(alt) + <- : Move caret to Previous(next ->) word
 - option(alt) + cmd(ctrl) + <- : Move caret to Previous(next ->) word in Different "CamelHumps" Mode
-
+- ctrl + P: view parameter info
+- ctrl + enter: code generate (Getters, Setters, Constructors, HashCode/equals, toString)
   <br>
 
 - ctrl + alt + I : Auto-Indent Lines
-- cmd(ctrl) + option(alt) + B : Go to class
-- cmd(ctrl) + option(alt) + B : Go to File
-
-  - 일부러 class or file로 이동하게끔 2개 커맨드가 같음
-
-  <br>
-
-- ctrl + P: view parameter info
-- ctrl + enter: code generate (Getters, Setters, Constructors, HashCode/equals, toString)
+- _**cmd(ctrl) + option(alt) + B : Go to class, Go to File, Go to Symbol, Go to Database Object**_
+  - 의도함 class, file, symbol, DTO로 이동하게끔 4개 커맨드가 같음
 
 <br>
 
 ### Find
 
-- cmd + B : Go to Declaration or Usages
-
-  <br>
-
+- **_cmd(ctrl) + B : Go to Declaration or Usages, Go to Implementation, Go to Type Declaration_**
 - cmd(ctrl) + D : Add Selection for Next Occurrence
 - cmd(ctrl) + shift + D : Select All Occurrences
 - cmd(ctrl) + G : Find Next / Move to Next Occurrence
 - cmd(ctrl) + shift + G : Find Previous / Move to Next Occurrence
 
-<br>
+
+### Git
+
+- cmd(ctrl) + k, cmd(ctrl) + k : commit
+- cmd(ctrl) + k, cmd(ctrl) + p : push
+- cmd(ctrl) + p, cmd(ctrl) + p : pull
 
 ### Editor Actions
 
 - cmd(ctrl) + `+(=)` : Increase Font Size
 - cmd(ctrl) + `-(-)` : Decrease Font Size
 
-<br>
-
-### githubCopilot
+### Github Copilot
 (vscode도 동일하게 맞춤, keybinding에서)
 
 - option(alt) + `[` : Copilot Show Previous Completions
 - option(alt) + `]` : Copilot Show Next Completions
 - option(alt) + `enter` : Open Github Copilot (선택지 10개정도 보여줌)
-- option(alt) + `\` : Copilot Show Completions
+- option(alt) + `\` : Copilot Show Completions (ctrl + space도 추가)
