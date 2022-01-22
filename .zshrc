@@ -8,6 +8,7 @@ fi
 # For Development
 export VSCODE='/Applications/Visual Studio Code.app/Contents/Resources/app/bin'
 export GOPATH='/Users/raphael/GoProjects'
+export KREW='/Users/raphael/.krew/bin'
 
 # On WSL
 # export VSCODE='/mnt/c/Program Files/Microsoft VS Code/bin'
@@ -15,7 +16,7 @@ export GOPATH='/Users/raphael/GoProjects'
 
 # If you come from bash you might have to change your $PATH.
 # add PATH, $GOPATH, vsCode intellij
-export PATH="$PATH:$HOME/bin:$VSCODE:$GOPATH:$GOPATH/go1.16.12/bin"
+export PATH="$PATH:$HOME/bin:$VSCODE:$GOPATH:$GOPATH/go1.16.12/bin:$KREW"
 ZSH_DISABLE_COMPFIX="true"
 
 # Path to your oh-my-zsh installation.
@@ -125,13 +126,14 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias ll='ls -alh'
 alias k='kubectl'
+alias ksr='k --sort-by=.metadata.creationTimestamp'
 alias e='exit'
 alias c='clear'
 alias tf='terraform'
 # alias cat='bat'
 
 # Set kubeconfig
-export KUBECONFIG=$HOME/.kube/config:$HOME/.kube/kubconfig-stg:$HOME/.kube/kubconfig-infra:$HOME/.kube/kubconfig-prod
+export KUBECONFIG=$HOME/.kube/config:$HOME/.kube/kubconfig-stg
 
 # autoCompletion kubectl on zsh
 source <(kubectl completion zsh)
