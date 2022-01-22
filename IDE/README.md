@@ -19,7 +19,7 @@ vscode keymap을 기반으로 커스텀해서 자주 사용 중인 키맵을 정
 - ctrl + space : Basic Code Completion
 - ctrl + shift + space : Smart Code Completion
   - (Type-matching: filters the list of methodsand variables by expected type)
-- ctrl + shift + enter : Complete statement  
+- ctrl + shift + enter : Complete statement
 - **cmd(ctrl) + option(alt) + T : Surround with ...**
 
   - 다음으로 코드 감싸기 (ifElse, tryCatch, for, synchronized, ...)
@@ -37,8 +37,8 @@ vscode keymap을 기반으로 커스텀해서 자주 사용 중인 키맵을 정
   <br>
 
 - ctrl + alt + I : Auto-Indent Lines
-- _**cmd(ctrl) + option(alt) + B : Go to class, Go to File, Go to Symbol, Go to Database Object**_
-  - 의도함 class, file, symbol, DTO로 이동하게끔 4개 커맨드가 같음
+- _**cmd(ctrl) + option(alt) + B : Go to class, File, Symbol, Database Object**_
+  - class, file, symbol, DTO로 이동하게끔 4개 커맨드가 같음
 
 <br>
 
@@ -50,6 +50,9 @@ vscode keymap을 기반으로 커스텀해서 자주 사용 중인 키맵을 정
 - cmd(ctrl) + G : Find Next / Move to Next Occurrence
 - cmd(ctrl) + shift + G : Find Previous / Move to Next Occurrence
 
+- **cmd(ctrl) + shift + F : Find in Project**
+- **cmd(ctrl) + shift + H : Replace in Project**
+- **cmd(ctrl) + shift + R : Refactor This**
 
 ### Git
 
@@ -63,6 +66,7 @@ vscode keymap을 기반으로 커스텀해서 자주 사용 중인 키맵을 정
 - cmd(ctrl) + `-(-)` : Decrease Font Size
 
 ### Github Copilot
+
 (vscode도 동일하게 맞춤, keybinding에서)
 
 - option(alt) + `[` : Copilot Show Previous Completions
