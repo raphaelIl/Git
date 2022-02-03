@@ -7,7 +7,7 @@ fi
 
 # For Development
 export VSCODE='/Applications/Visual Studio Code.app/Contents/Resources/app/bin'
-export GOPATH='/Users/raphael/GoProjects'
+export GOPATH='/Users/raphael/Desktop/GoProjects'
 export KREW='/Users/raphael/.krew/bin'
 
 # On WSL
@@ -127,30 +127,32 @@ source $ZSH/oh-my-zsh.sh
 alias ll='ls -alh'
 alias k='kubectl'
 alias ksr='k --sort-by=.metadata.creationTimestamp'
+alias kn='k neat'
 alias e='exit'
 alias c='clear'
 alias tf='terraform'
 # alias cat='bat'
 
-# Set kubeconfig
-export KUBECONFIG=$HOME/.kube/config:$HOME/.kube/kubconfig-stg
-
-# autoCompletion kubectl on zsh
-source <(kubectl completion zsh)
-complete -F __start_kubectl k
-
-# autoCompletion aws on zsh
+# AutoCompletion aws on zsh
 complete -C '/usr/local/bin/aws_completer' aws
 
 # asdf
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
 
-# autoCompletion terraform on zsh
+# AutoCompletion terraform on zsh
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terraform terraform
 
-# autoCompletion saml2aws on zsh
-eval "$(saml2aws --completion-script-zsh)"
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Set kubeconfig
+export KUBECONFIG=/Users/raphael/.kube/config:/Users/raphael/.kube/kubeconfig-commerce-stg
+
+# AutoComplete Kubernetes
+alias k='kubectl'
+complete -F __start_kubectl k
+source <(kubectl completion zsh)
+
+# AutoComplete Saml2aws
+eval "$(saml2aws --completion-script-zsh)"
