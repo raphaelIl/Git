@@ -56,16 +56,24 @@ vscode keymap을 기반으로 커스텀해서 자주 사용 중인 키맵을 정
 
 ### Git
 
-- cmd(ctrl) + k, cmd(ctrl) + k : commit
-- cmd(ctrl) + k, cmd(ctrl) + p : push
-- cmd(ctrl) + p, cmd(ctrl) + p : pull
+- cmd(ctrl) + P, cmd(ctrl) + P : pull
+- cmd(ctrl) + K, cmd(ctrl) + K : commit
+- cmd(ctrl) + K, cmd(ctrl) + P : push
+- cmd(ctrl) + K, cmd(ctrl) + R : rollback
+- cmd(ctrl) + K, cmd(ctrl) + H : Show History
+- cmd(ctrl) + K, cmd(ctrl) + B : Compare with Branch
+
+### view
+
+- cmd(ctrl) + K, cmd(ctrl) + C : Compare Files
+- cmd(ctrl) + K, cmd(ctrl) + E : Compare File with Editor
 
 ### Editor Actions
 
 - cmd(ctrl) + `+(=)` : Increase Font Size
 - cmd(ctrl) + `-(-)` : Decrease Font Size
 
-### Github Copilot
+### GitHub Copilot
 
 (vscode도 동일하게 맞춤, keybinding에서)
 
