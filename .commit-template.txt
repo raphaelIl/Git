@@ -1,0 +1,10 @@
+# 제목: 영문 명령형으로 작성하자
+# If applied, this commit will {Commit Subject}
+# If applied, this commit will Add login api
+# If applied, this commit will Refactor subsystem X for readability
+# If applied, this commit will Update getting started documentation
+# If applied, this commit will Remove deprecated methods
+
+# 본문: 어떻게 보다는 무엇과 왜를 설명한다. 본문에서는 명령형으로 작성할 필요가 없다.
+# Simplify serialize.h's exception handling
+# Remove the 'state' and 'exceptmask' from serialize.h's stream implementations, as well as related methods.
