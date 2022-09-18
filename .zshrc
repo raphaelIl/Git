@@ -7,7 +7,7 @@ fi
 
 # For Development
 export VSCODE='/Applications/Visual Studio Code.app/Contents/Resources/app/bin'
-export GOPATH='/Users/raphael/Desktop/GoProjects'
+export GOPATH='/Users/raphael/Desktop/GoProjects/go1.18.4'
 export KREW='/Users/raphael/.krew/bin'
 
 # On WSL
@@ -16,7 +16,8 @@ export KREW='/Users/raphael/.krew/bin'
 
 # If you come from bash you might have to change your $PATH.
 # add PATH, $GOPATH, vsCode intellij
-export PATH="$PATH:$HOME/bin:$VSCODE:$GOPATH:$GOPATH/go1.16.12/bin:$KREW"
+# export GOBIN16="$GOPATH/go1.16.15/bin"
+export PATH="$PATH:$KREW:$HOME/bin:$VSCODE:$GOPATH/bin"
 ZSH_DISABLE_COMPFIX="true"
 
 # Path to your oh-my-zsh installation.
@@ -128,6 +129,8 @@ alias ll='ls -alh'
 alias k='kubectl'
 alias ksr='k --sort-by=.metadata.creationTimestamp'
 alias kn='k neat'
+# kubectl-slice -f cert-manager.yaml -t "{{.kind}}.yaml" -o cert-manager
+alias ks='kubectl-slice'
 alias e='exit'
 alias c='clear'
 alias tf='terraform'
@@ -143,16 +146,16 @@ complete -C '/usr/local/bin/aws_completer' aws
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terraform terraform
 
+# AutoCompletion helm on zsh
+source <(helm completion zsh)
+
+# kubebuilder autocompletion
+source <(kubebuilder completion zsh)
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# Set kubeconfig
-export KUBECONFIG=/Users/raphael/.kube/config:/Users/raphael/.kube/kubeconfig-commerce-stg
-
-# AutoComplete Kubernetes
-alias k='kubectl'
-complete -F __start_kubectl k
-source <(kubectl completion zsh)
-
-# AutoComplete Saml2aws
-eval "$(saml2aws --completion-script-zsh)"
+# Get the aliases and functions for Kurly Kubernetes Config
+if [ -f ~/.zshrc.kurly ]; then
+  . ~/.zshrc.kurly
+fi
