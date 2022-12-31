@@ -7,8 +7,11 @@ fi
 
 # For Development
 export VSCODE='/Applications/Visual Studio Code.app/Contents/Resources/app/bin'
-export GOPATH='/Users/raphael/Desktop/GoProjects/go1.18.4'
+export GOPATH='/Users/raphael/Desktop/GoProjects/go1.18.8'
 export KREW='/Users/raphael/.krew/bin'
+
+export PATH="$HOME/.jenv/bin:$PATH"
+eval "$(jenv init -)"
 
 # On WSL
 # export VSCODE='/mnt/c/Program Files/Microsoft VS Code/bin'
@@ -29,6 +32,7 @@ export ZSH="/Users/raphael/.oh-my-zsh"
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 # ZSH_THEME="dracula"
 ZSH_THEME="powerlevel10k/powerlevel10k"
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -126,7 +130,6 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias ll='ls -alh'
-alias k='kubectl'
 alias ksr='k --sort-by=.metadata.creationTimestamp'
 alias kn='k neat'
 # kubectl-slice -f cert-manager.yaml -t "{{.kind}}.yaml" -o cert-manager
@@ -134,20 +137,16 @@ alias ks='kubectl-slice'
 alias e='exit'
 alias c='clear'
 alias tf='terraform'
-# alias cat='bat'
+alias saml='saml2aws login --force --skip-prompt --mfa-token=$1'
 
-# AutoCompletion aws on zsh
-complete -C '/usr/local/bin/aws_completer' aws
+# AutoComplete argo-rollout
+source <(kubectl-argo-rollouts completion zsh)
+
+alias kar='kubectl-argo-rollouts'
+# alias cat='bat'
 
 # asdf
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
-
-# AutoCompletion terraform on zsh
-autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C /opt/homebrew/bin/terraform terraform
-
-# AutoCompletion helm on zsh
-source <(helm completion zsh)
 
 # kubebuilder autocompletion
 source <(kubebuilder completion zsh)
@@ -156,6 +155,4 @@ source <(kubebuilder completion zsh)
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # Get the aliases and functions for Kurly Kubernetes Config
-if [ -f ~/.zshrc.kurly ]; then
-  . ~/.zshrc.kurly
-fi
+[[ ! -f ~/.zshrc.kurly ]] || source ~/.zshrc.kurly

@@ -1,0 +1,20 @@
+# AutoComplete
+autoload -U +X bashcompinit && bashcompinit
+autoload -Uz compinit && compinit
+
+# Set kubeconfig
+export KUBECONFIG=$HOME/.kube/config:$HOME/.kube/kubeconfig-mgmt-infra:$HOME/.kube/kubeconfig-prod-lps:$HOME/.kube/kubeconfig-stg-lps:$HOME/.kube/kubeconfig-playground-sre:$HOME/.kube/kubeconfig-stg-mgmt:$HOME/.kube/kubeconfig-stg-commerce:$HOME/.kube/kubeconfig-infra-mgmt:$HOME/.kube/kubeconfig-stg-logistics
+
+# Kubernetes
+alias k='/usr/local/bin/kubectl'
+complete -o default -F __start_kubectl k
+[[ $commands[kubectl] ]] && source <(kubectl completion zsh)
+
+# saml2aws
+eval "$(saml2aws --completion-script-zsh)"
+
+# aws
+complete -C '$(which aws_completer)' aws
+
+# terraform
+eval "$(terraform -install-autocomplete)"
