@@ -7,7 +7,7 @@ fi
 
 # For Development
 export VSCODE='/Applications/Visual Studio Code.app/Contents/Resources/app/bin'
-export GOPATH='/Users/raphael/Desktop/GoProjects/go1.18.8'
+export GOPATH="$HOME/Desktop/GoProjects/go1.18.10"
 export KREW='/Users/raphael/.krew/bin'
 
 export PATH="$HOME/.jenv/bin:$PATH"
