@@ -8,7 +8,7 @@ fi
 # For Development
 export VSCODE='/Applications/Visual Studio Code.app/Contents/Resources/app/bin'
 export GOPATH="$HOME/Desktop/GoProjects/go1.18.10"
-export KREW='/Users/raphael/.krew/bin'
+export KREW="$PATH/.krew/bin"
 
 export PATH="$HOME/.jenv/bin:$PATH"
 eval "$(jenv init -)"
@@ -32,7 +32,6 @@ export ZSH="$HOME/.oh-my-zsh"
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 # ZSH_THEME="dracula"
 ZSH_THEME="powerlevel10k/powerlevel10k"
-typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -104,31 +103,12 @@ plugins=(
 )
 source $ZSH/oh-my-zsh.sh
 
+# TLS handshake timeout
+# sudo ip link set eth0 mtu 1200
+
 # User configuration
+export KUBE_EDITOR="vim"
 
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
 alias ll='ls -alh'
 alias ksr='k --sort-by=.metadata.creationTimestamp'
 alias kn='k neat'
@@ -140,19 +120,25 @@ alias tf='terraform'
 alias saml='saml2aws login --force --skip-prompt --mfa-token=$1'
 
 # AutoComplete argo-rollout
-source <(kubectl-argo-rollouts completion zsh)
+#source <(kubectl-argo-rollouts completion zsh)
+#alias kar='kubectl-argo-rollouts'
 
-alias kar='kubectl-argo-rollouts'
 # alias cat='bat'
 
 # asdf
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
 
 # kubebuilder autocompletion
-source <(kubebuilder completion zsh)
+#source <(kubebuilder completion zsh)
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+
+# terraform
+# eval "$(terraform -install-autocomplete)"
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /home/linuxbrew/.linuxbrew/Cellar/terraform/1.3.7/bin/terraform terraform
 
 # Get the aliases and functions for Kurly Kubernetes Config
 [[ ! -f ~/.zshrc.kurly ]] || source ~/.zshrc.kurly
