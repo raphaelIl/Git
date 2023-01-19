@@ -7,14 +7,10 @@ export KUBECONFIG=$HOME/.kube/config:$HOME/.kube/kubeconfig-mgmt-infra:$HOME/.ku
 
 # Kubernetes
 alias k='/usr/local/bin/kubectl'
-complete -o default -F __start_kubectl k
-[[ $commands[kubectl] ]] && source <(kubectl completion zsh)
+[[ -f ~/${fpath[1]}/_kubectl ]] || `kubectl completion zsh > "${fpath[1]}/_kubectl"`
 
 # saml2aws
 eval "$(saml2aws --completion-script-zsh)"
 
 # aws
 complete -C '$(which aws_completer)' aws
-
-# terraform
-eval "$(terraform -install-autocomplete)"
