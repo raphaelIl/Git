@@ -171,15 +171,20 @@ kapply() {
     return 1
   fi
 
-  kubectl diff "$@"
+  diff_output=$(kubectl diff "$@" 2>&1)
+  
+  if [ -z "$diff_output" ]; then
+    echo -e "\033[32mNo changes found. Nothing to apply.\033[0m"
+    return 0
+  fi
 
+  echo "$diff_output"
   echo -e "\033[33m----------------------------------------\033[0m"
   echo -e "\033[33mDiff checking complete\033[0m"
   echo -e "\033[33m----------------------------------------\033[0m"
 
   echo -n -e "\033[32mApply changes? (y/N): \033[0m"
   read confirm
-
   if [ "$confirm" = "y" ]; then
     kubectl apply "$@"
   else
@@ -193,16 +198,21 @@ kdelete() {
     return 1
   fi
 
-  echo -e "\033[33mThe following resources will be deleted:\033[0m"
-  kubectl get "$@"
+  delete_output=$(kubectl get "$@" 2>&1)
 
+  if [[ "$delete_output" =~ "No resources found" ]] || [ -z "$delete_output" ]; then
+    echo -e "\033[32mNo matching resources found. Nothing to delete.\033[0m"
+    return 0
+  fi
+
+  echo -e "\033[33mThe following resources will be deleted:\033[0m"
+  echo "$delete_output"
   echo -e "\033[33m----------------------------------------\033[0m"
   echo -e "\033[33mResource listing complete\033[0m"
   echo -e "\033[33m----------------------------------------\033[0m"
 
   echo -n -e "\033[32mDelete resources? (y/N): \033[0m"
   read confirm
-
   if [ "$confirm" = "y" ]; then
     kubectl delete "$@"
   else
