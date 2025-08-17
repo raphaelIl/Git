@@ -142,7 +142,6 @@ alias c='clear'
 alias tf='terraform'
 alias saml='saml2aws login --force --skip-prompt --mfa-token=$1'
 # export KUBE_EDITOR=/opt/homebrew/bin/code
-export KUBE_EDITOR=/usr/bin/vim
 
 # AutoComplete argo-rollout
 source <(kubectl-argo-rollouts completion zsh)
@@ -157,14 +156,16 @@ alias kar='kubectl-argo-rollouts'
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 # typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
-# terraform
+## terraform
 # eval "$(terraform -install-autocomplete)"
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terraform terraform
 
-# kubectl wrapper
+## kubectl
 # custom diff
 export KUBECTL_EXTERNAL_DIFF="colordiff -N -u" # brew install colordiff
+export KUBE_EDITOR=/usr/bin/vim
+PROMPT='$(kube_ps1)'$PROMPT # or RPROMPT='$(kube_ps1)'
 
 # Resolve the real kubectl binary once
 KUBECTL_BIN="${KUBECTL_BIN:-$(command -v kubectl)}"
@@ -175,6 +176,10 @@ kubectl() {
   if [ -n "${KUBECTL_WRAPPER_BYPASS:-}" ]; then
     command "$KUBECTL_BIN" "$@"
     return $?
+  fi
+
+  if [ "$1" = "__complete" ] || [ -n "${COMP_LINE:-}" ]; then
+    command "$KUBECTL_BIN" "$@"; return $?
   fi
 
   echo -e "\033[31m[WARNING]\033[0m You are running kubectl directly."
@@ -285,7 +290,6 @@ EOF
       ;;
   esac
 }
-
 
 # https://istio.io/latest/docs/ops/diagnostic-tools/istioctl/#istioctl-auto-completion
 # if type brew &>/dev/null; then
