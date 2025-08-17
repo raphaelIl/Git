@@ -237,6 +237,7 @@ kdelete() {
     return 1
   fi
 
+  # Identify exact targets via dry-run (no real deletion)
   targets_text=$(KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" delete "$@" \
     --dry-run=client -o name --ignore-not-found=true 2>&1)
   rc=$?
@@ -252,7 +253,7 @@ kdelete() {
     return 0
   fi
 
-  # Converting a list of names to an array
+  # Convert list to array (portable: bash/zsh)
   targets=()
   while IFS= read -r line; do
     [ -n "$line" ] && targets+=("$line")
@@ -262,7 +263,7 @@ EOF
 
   echo -e "\033[33mThe following resources will be deleted:\033[0m"
 
-  # Readability preview: wide attempt, name only if failed
+  # Readable preview (wide first, fallback to names)
   if ! KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" get "${targets[@]}" -o wide 2>/dev/null; then
     printf '%s\n' "${targets[@]}"
   fi
@@ -271,6 +272,7 @@ EOF
   echo -e "\033[33mDelete preview complete\033[0m"
   echo -e "\033[33m----------------------------------------\033[0m"
 
+  # Confirmation (y/Y only → execute)
   echo -n -e "\033[32mDelete resources? (y/N): \033[0m"
   read -r confirm
   case "$confirm" in
@@ -283,6 +285,7 @@ EOF
       ;;
   esac
 }
+
 
 # https://istio.io/latest/docs/ops/diagnostic-tools/istioctl/#istioctl-auto-completion
 # if type brew &>/dev/null; then
