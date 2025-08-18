@@ -161,25 +161,20 @@ alias kar='kubectl-argo-rollouts'
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terraform terraform
 
-## kubectl
-# custom diff
-export KUBECTL_EXTERNAL_DIFF="colordiff -N -u" # brew install colordiff
+## kubectl (wrapper + completion reuse)
+# Pretty diff / editor
+export KUBECTL_EXTERNAL_DIFF="colordiff -N -u"   # brew install colordiff
 export KUBE_EDITOR=/usr/bin/vim
-PROMPT='$(kube_ps1)'$PROMPT # or RPROMPT='$(kube_ps1)'
 
-# Resolve the real kubectl binary once
+# Resolve real kubectl binary (prefer binary path, not alias/function)
 KUBECTL_BIN="${KUBECTL_BIN:-$(command -v kubectl)}"
 
 # Wrapper: prompt when user runs kubectl directly in interactive shell
 kubectl() {
-  # If bypass flag is set (e.g., called from kapply/kdelete), run real kubectl quietly
-  if [ -n "${KUBECTL_WRAPPER_BYPASS:-}" ]; then
+  # Bypass for internal calls (kapply/kdelete) or completion engine
+  if [ -n "${KUBECTL_WRAPPER_BYPASS:-}" ] || [ "$1" = "__complete" ] || [ -n "${COMP_LINE:-}" ]; then
     command "$KUBECTL_BIN" "$@"
     return $?
-  fi
-
-  if [ "$1" = "__complete" ] || [ -n "${COMP_LINE:-}" ]; then
-    command "$KUBECTL_BIN" "$@"; return $?
   fi
 
   echo -e "\033[31m[WARNING]\033[0m You are running kubectl directly."
@@ -187,13 +182,8 @@ kubectl() {
   echo -n -e "\033[32mAre you sure you want to run kubectl? (y/N): \033[0m"
   read -r confirm
   case "$confirm" in
-    y|Y)
-      command "$KUBECTL_BIN" "$@"
-      ;;
-    *)
-      echo -e "\033[31mAborted.\033[0m"
-      return 1
-      ;;
+    y|Y) command "$KUBECTL_BIN" "$@" ;;
+    *)   echo -e "\033[31mAborted.\033[0m"; return 1 ;;
   esac
 }
 
@@ -203,36 +193,25 @@ kapply() {
     return 1
   fi
 
-  # Use bypass to avoid wrapper prompt
+  # Diff preview (kubectl exit: 0=no diff, 1=diff present, >1=error)
   diff_output=$(KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" diff "$@" 2>&1)
   diff_status=$?
 
-  # Interpret kubectl diff exit codes:
-  # 0 => no differences; 1 => differences found; >1 => error
   if [ $diff_status -eq 0 ] && [ -z "$diff_output" ]; then
-    echo -e "\033[32mNo changes found. Nothing to apply.\033[0m"
-    return 0
+    echo -e "\033[32mNo changes found. Nothing to apply.\033[0m"; return 0
   elif [ $diff_status -gt 1 ]; then
     echo -e "\033[31mError running 'kubectl diff'. See details below:\033[0m"
-    echo "$diff_output"
-    return $diff_status
+    echo "$diff_output"; return $diff_status
   fi
 
   echo "$diff_output"
-  echo -e "\033[33m----------------------------------------\033[0m"
-  echo -e "\033[33mDiff checking complete\033[0m"
-  echo -e "\033[33m----------------------------------------\033[0m"
+  echo -e "\033[33m----------------------------------------\nDiff checking complete\n----------------------------------------\033[0m"
 
   echo -n -e "\033[32mApply changes? (y/N): \033[0m"
   read -r confirm
   case "$confirm" in
-    y|Y)
-      KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" apply "$@"
-      ;;
-    *)
-      echo -e "\033[31mAborted.\033[0m"
-      return 1
-      ;;
+    y|Y) KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" apply "$@" ;;
+    *)   echo -e "\033[31mAborted.\033[0m"; return 1 ;;
   esac
 }
 
@@ -242,15 +221,14 @@ kdelete() {
     return 1
   fi
 
-  # Identify exact targets via dry-run (no real deletion)
+  # Identify targets safely (no real deletion)
   targets_text=$(KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" delete "$@" \
     --dry-run=client -o name --ignore-not-found=true 2>&1)
   rc=$?
 
   if [ $rc -gt 0 ]; then
     echo -e "\033[31mError preparing delete preview. See details below:\033[0m"
-    echo "$targets_text"
-    return $rc
+    echo "$targets_text"; return $rc
   fi
 
   if [ -z "$targets_text" ]; then
@@ -262,34 +240,52 @@ kdelete() {
   targets=()
   while IFS= read -r line; do
     [ -n "$line" ] && targets+=("$line")
-  done <<EOF
-$(printf '%s\n' "$targets_text" | sed '/^\s*$/d')
-EOF
+  done < <( printf '%s\n' "$targets_text" | sed -E '/^[[:space:]]*$/d' )
 
   echo -e "\033[33mThe following resources will be deleted:\033[0m"
-
-  # Readable preview (wide first, fallback to names)
+  # Wide preview first; fallback to names
   if ! KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" get "${targets[@]}" -o wide 2>/dev/null; then
     printf '%s\n' "${targets[@]}"
   fi
+  echo -e "\033[33m----------------------------------------\nDelete preview complete\n----------------------------------------\033[0m"
 
-  echo -e "\033[33m----------------------------------------\033[0m"
-  echo -e "\033[33mDelete preview complete\033[0m"
-  echo -e "\033[33m----------------------------------------\033[0m"
-
-  # Confirmation (y/Y only → execute)
   echo -n -e "\033[32mDelete resources? (y/N): \033[0m"
   read -r confirm
   case "$confirm" in
-    y|Y)
-      KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" delete "$@"
-      ;;
-    *)
-      echo -e "\033[31mAborted.\033[0m"
-      return 1
-      ;;
+    y|Y) KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" delete "$@" ;;
+    *)   echo -e "\033[31mAborted.\033[0m"; return 1 ;;
   esac
 }
+
+# ---------- Completion reuse for kapply/kdelete ----------
+# Reuse oh-my-zsh kubectl completer if it's loaded.
+if typeset -f _kubectl >/dev/null; then
+  # kapply → behave like: kubectl apply …
+  _kapply() {
+    local -a _orig; _orig=("${words[@]}")
+    local _cur=$CURRENT
+    words=(kubectl apply "${_orig[2,-1]}")
+    CURRENT=$(( _cur + 1 ))
+    _kubectl
+    words=("${_orig[@]}"); CURRENT=$_cur
+  }
+  compdef _kapply kapply
+
+  # kdelete → behave like: kubectl delete …
+  _kdelete() {
+    local -a _orig; _orig=("${words[@]}")
+    local _cur=$CURRENT
+    words=(kubectl delete "${_orig[2,-1]}")
+    CURRENT=$(( _cur + 1 ))
+    _kubectl
+    words=("${_orig[@]}"); CURRENT=$_cur
+  }
+  compdef _kdelete kdelete
+
+  # Ensure kubectl itself is bound (harmless if already set)
+  compdef _kubectl kubectl
+fi
+
 
 # https://istio.io/latest/docs/ops/diagnostic-tools/istioctl/#istioctl-auto-completion
 # if type brew &>/dev/null; then
