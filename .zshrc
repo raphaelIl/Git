@@ -177,13 +177,32 @@ kubectl() {
     return $?
   fi
 
-  echo -e "\033[31m[WARNING]\033[0m You are running kubectl directly."
-  echo -e "\033[33mRecommended: use kapply / kdelete instead.\033[0m"
-  echo -n -e "\033[32mAre you sure you want to run kubectl? (y/N): \033[0m"
+  local context cluster namespace
+  context=$(command "$KUBECTL_BIN" config current-context 2>/dev/null)
+  cluster=$(command "$KUBECTL_BIN" config view -o jsonpath='{.contexts[?(@.name=="'"$context"'")].context.cluster}' 2>/dev/null)
+  namespace=$(command "$KUBECTL_BIN" config view -o jsonpath='{.contexts[?(@.name=="'"$context"'")].context.namespace}' 2>/dev/null)
+
+  if [ -z "$namespace" ]; then
+    namespace="default"
+  fi
+
+  echo -e "\033[31m[WARNING]\033[0m You are running kubectl directly." >&2
+  echo -e "\033[33mRecommended: use kapply / kdelete instead.\033[0m" >&2
+  echo -e "\033[36mCurrent Context:\033[0m $context" >&2
+  echo -e "\033[36mCluster:\033[0m $cluster" >&2
+  echo -e "\033[36mNamespace:\033[0m $namespace" >&2
+  echo -n -e "\033[32mAre you sure you want to run kubectl? (y/N): \033[0m" >&2
+
   read -r confirm
   case "$confirm" in
-    y|Y) command "$KUBECTL_BIN" "$@" ;;
-    *)   echo -e "\033[31mAborted.\033[0m"; return 1 ;;
+    y|Y)
+      echo >&2
+      command "$KUBECTL_BIN" "$@"
+      ;;
+    *)
+      echo -e "\033[31mAborted.\033[0m" >&2
+      return 1
+      ;;
   esac
 }
 
