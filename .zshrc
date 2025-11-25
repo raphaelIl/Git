@@ -5,38 +5,20 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# For Dev
-export VSCODE="/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
-# export GOPATH="$HOME/Desktop/GoProjects/go1.18.8"
-export GOPATH="$HOME/.GoProjects/go1.19.5"
-export KREW="$HOME/.krew/bin"
-export PATH="$HOME/.jenv/bin:$PATH"
-export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
-
-eval "$(jenv init -)"
-
-# On WSL
-# export VSCODE='/mnt/c/Program Files/Microsoft VS Code/bin'
-# export IDEA='/mnt/c/Program Files/JetBrains/IntelliJ IDEA 2021.2.1/bin'
-
 # If you come from bash you might have to change your $PATH.
-# add PATH, $GOPATH, vsCode intellij
-# export GOBIN16="$GOPATH/go1.16.15/bin"
-export PATH="$PATH:$KREW:$HOME/bin:$VSCODE:$GOPATH/bin:"
-ZSH_DISABLE_COMPFIX="true"
+# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
-# Path to your oh-my-zsh installation.
+# Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
+# load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-# ZSH_THEME="dracula"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random editor cause zsh to load
+# Setting this variable when ZSH_THEME=random will cause zsh to load
 # a theme from this variable instead of looking in $ZSH/themes/
 # If set to an empty array, this variable will have no effect.
 # ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
@@ -97,14 +79,13 @@ HIST_STAMPS="yyyy-mm-dd"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git
-  zsh-syntax-highlighting
   zsh-autosuggestions
+  zsh-syntax-highlighting
   fzf
-  fasd
-  asdf
-  kubectl # kubectx
+  kubectl
   kube-ps1
 )
+
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
@@ -118,15 +99,18 @@ source $ZSH/oh-my-zsh.sh
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
 # else
-#   export EDITOR='mvim'
+#   export EDITOR='nvim'
 # fi
 
 # Compilation flags
-# export ARCHFLAGS="-arch x86_64"
+# export ARCHFLAGS="-arch $(uname -m)"
 
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# Set personal aliases, overriding those provided by Oh My Zsh libs,
+# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+# users are encouraged to define aliases within a top-level file in
+# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+# - $ZSH_CUSTOM/aliases.zsh
+# - $ZSH_CUSTOM/macos.zsh
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
@@ -142,19 +126,33 @@ alias c='clear'
 alias tf='terraform'
 alias saml='saml2aws login --force --skip-prompt --mfa-token=$1'
 # export KUBE_EDITOR=/opt/homebrew/bin/code
-
 # AutoComplete argo-rollout
 source <(kubectl-argo-rollouts completion zsh)
-
 alias kar='kubectl-argo-rollouts'
-# alias cat='bat'
 
-# kubebuilder autocompletion
-# source <(kubebuilder completion zsh)
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/raphaelil/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+
+# Node.js
+export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
+
+# local bin
+export PATH="$HOME/.local/bin:$PATH"
+
+# saml2aws
+eval "$(saml2aws --completion-script-zsh)"
+
+# aws
+complete -C '$(which aws_completer)' aws
+
+# istioctl
+# source <(istioctl completion zsh)
+# source $PATHISTIO/tools/_istioctl
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-# typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
 ## terraform
 # eval "$(terraform -install-autocomplete)"
@@ -169,6 +167,16 @@ export KUBE_EDITOR=/usr/bin/vim
 # Resolve real kubectl binary (prefer binary path, not alias/function)
 KUBECTL_BIN="${KUBECTL_BIN:-$(command -v kubectl)}"
 
+# ---- Color toggle (NO_COLOR / KUBECTL_NO_COLOR / FORCE) ----
+export KUBECTL_FORCE_COLOR=1
+if [ -n "${KUBECTL_FORCE_COLOR:-}" ]; then
+  RED="\033[31m"; YEL="\033[33m"; CYN="\033[36m"; GRN="\033[32m"; BLU="\033[34m"; MAG="\033[35m"; RST="\033[0m"
+elif [ -n "${NO_COLOR:-${KUBECTL_NO_COLOR:-}}" ] || ! [ -t 2 ]; then
+  RED=""; YEL=""; CYN=""; GRN=""; BLU=""; MAG=""; RST=""
+else
+  RED="\033[31m"; YEL="\033[33m"; CYN="\033[36m"; GRN="\033[32m"; BLU="\033[34m"; MAG="\033[35m"; RST="\033[0m"
+fi
+
 # Wrapper: prompt when user runs kubectl directly in interactive shell
 kubectl() {
   # Bypass for internal calls (kapply/kdelete) or completion engine
@@ -177,30 +185,69 @@ kubectl() {
     return $?
   fi
 
+  # ---- FAST META (single kubectl call) ----
+  # All temps are local to avoid leaking into the user shell.
   local context cluster namespace
-  context=$(command "$KUBECTL_BIN" config current-context 2>/dev/null)
-  cluster=$(command "$KUBECTL_BIN" config view -o jsonpath='{.contexts[?(@.name=="'"$context"'")].context.cluster}' 2>/dev/null)
-  namespace=$(command "$KUBECTL_BIN" config view -o jsonpath='{.contexts[?(@.name=="'"$context"'")].context.namespace}' 2>/dev/null)
+  local __kcfg_json __kcfg_raw
 
-  if [ -z "$namespace" ]; then
-    namespace="default"
+  if command -v jq >/dev/null 2>&1; then
+    __kcfg_json=$(command "$KUBECTL_BIN" config view --minify -o json 2>/dev/null)
+    # Use jq to extract three fields in one go; fallback-safe (// "")
+    context=$(jq -r '.contexts[0].name // ""' <<<"$__kcfg_json")
+    cluster=$(jq -r '.contexts[0].context.cluster // ""' <<<"$__kcfg_json")
+    namespace=$(jq -r '.contexts[0].context.namespace // ""' <<<"$__kcfg_json")
+  else
+    # Fallback without jq: still single kubectl call using JSONPath
+    __kcfg_raw=$(
+      command "$KUBECTL_BIN" config view --minify \
+        -o jsonpath='{.contexts[0].context.cluster}{"\n"}{.contexts[0].context.namespace}{"\n"}{.contexts[0].name}{"\n"}' 2>/dev/null
+    )
+    # Split three lines into three locals (portable bash/zsh)
+#     IFS=$'\n' read -r cluster namespace context <<'EOF'
+# '"$__kcfg_raw"'
+# EOF
+    # 위의 히어문은 따옴표 보존 이슈가 있을 수 있으니, 문제가 되면 아래와 같이 간단히 바꿔도 됩니다:
+    IFS=$'\n' read -r cluster namespace context <<<"$__kcfg_raw"
   fi
 
-  echo -e "\033[31m[WARNING]\033[0m You are running kubectl directly." >&2
-  echo -e "\033[33mRecommended: use kapply / kdelete instead.\033[0m" >&2
-  echo -e "\033[36mCurrent Context:\033[0m $context" >&2
-  echo -e "\033[36mCluster:\033[0m $cluster" >&2
-  echo -e "\033[36mNamespace:\033[0m $namespace" >&2
-  echo -n -e "\033[32mAre you sure you want to run kubectl? (y/N): \033[0m" >&2
+  # Defaults and rare fallbacks
+  [ -z "$namespace" ] && namespace="default"
+  if [ -z "$context" ]; then
+    context=$(command "$KUBECTL_BIN" config current-context 2>/dev/null)
+  fi
 
+  # Header
+  echo -e "${RED}[WARNING]${RST} You are running kubectl directly." >&2
+  echo -e "${YEL}Recommended: use kapply / kdelete instead.${RST}" >&2
+  echo -e "${CYN}Current Context:${RST} $context" >&2
+  echo -e "${CYN}Cluster:${RST} $cluster" >&2
+  echo -e "${CYN}Namespace:${RST} $namespace" >&2
+
+  # Non-interactive safety: avoid blocking in CI/pipes
+  if ! [ -t 0 ] && [ -z "${KUBECTL_ASSUME_YES:-}" ]; then
+    echo -e "${RED}[DANGER]${RST} Non-interactive shell detected; refusing to prompt. Set KUBECTL_ASSUME_YES=1 to proceed." >&2
+    return 1
+  fi
+
+  # Optional override to skip prompt (CI/automation)
+  if [ -n "${KUBECTL_ASSUME_YES:-}" ]; then
+    echo -e "${MAG}[auto]${RST} KUBECTL_ASSUME_YES=1 → continuing without prompt." >&2
+    echo >&2
+    command "$KUBECTL_BIN" "$@"
+    return $?
+  fi
+
+  # Interactive prompt
+  echo -n -e "${GRN}Are you sure you want to run kubectl? (y/N): ${RST}" >&2
   read -r confirm
   case "$confirm" in
     y|Y)
       echo >&2
       command "$KUBECTL_BIN" "$@"
+      return $?
       ;;
     *)
-      echo -e "\033[31mAborted.\033[0m" >&2
+      echo -e "${RED}Aborted.${RST}" >&2
       return 1
       ;;
   esac
@@ -208,78 +255,77 @@ kubectl() {
 
 kapply() {
   if [ -z "$1" ]; then
-    echo -e "\033[31mUsage: kapply [-f <file> | -k <kustomization-dir>]\033[0m"
+    echo -e "${RED}Usage: kapply [-f <file> | -k <kustomization-dir>]${RST}"
     return 1
   fi
 
   # Diff preview (kubectl exit: 0=no diff, 1=diff present, >1=error)
+  local diff_output diff_status
   diff_output=$(KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" diff "$@" 2>&1)
   diff_status=$?
 
   if [ $diff_status -eq 0 ] && [ -z "$diff_output" ]; then
-    echo -e "\033[32mNo changes found. Nothing to apply.\033[0m"; return 0
+    echo -e "${GRN}No changes found. Nothing to apply.${RST}"; return 0
   elif [ $diff_status -gt 1 ]; then
-    echo -e "\033[31mError running 'kubectl diff'. See details below:\033[0m"
+    echo -e "${RED}Error running 'kubectl diff'. See details below:${RST}"
     echo "$diff_output"; return $diff_status
   fi
 
   echo "$diff_output"
-  echo -e "\033[33m----------------------------------------\nDiff checking complete\n----------------------------------------\033[0m"
+  echo -e "${YEL}----------------------------------------\nDiff checking complete\n----------------------------------------${RST}"
 
-  echo -n -e "\033[32mApply changes? (y/N): \033[0m"
+  echo -n -e "${GRN}Apply changes? (y/N): ${RST}"
   read -r confirm
   case "$confirm" in
-    y|Y) KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" apply "$@" ;;
-    *)   echo -e "\033[31mAborted.\033[0m"; return 1 ;;
+    y|Y) KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" apply "$@"; return $? ;;
+    *)   echo -e "${RED}Aborted.${RST}"; return 1 ;;
   esac
 }
 
 kdelete() {
   if [ -z "$1" ]; then
-    echo -e "\033[31mUsage: kdelete [-f <file> | -k <kustomization-dir> | <type[/name]> ...]\033[0m"
+    echo -e "${RED}Usage: kdelete [-f <file> | -k <kustomization-dir> | <type[/name]> ...]${RST}"
     return 1
   fi
 
-  # Identify targets safely (no real deletion)
+  local targets_text rc
   targets_text=$(KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" delete "$@" \
     --dry-run=client -o name --ignore-not-found=true 2>&1)
   rc=$?
 
   if [ $rc -gt 0 ]; then
-    echo -e "\033[31mError preparing delete preview. See details below:\033[0m"
+    echo -e "${RED}Error preparing delete preview. See details below:${RST}"
     echo "$targets_text"; return $rc
   fi
 
   if [ -z "$targets_text" ]; then
-    echo -e "\033[32mNo matching resources found. Nothing to delete.\033[0m"
+    echo -e "${GRN}No matching resources found. Nothing to delete.${RST}"
     return 0
   fi
 
-  # Convert list to array (portable: bash/zsh)
-  targets=()
+  # List to array (bash/zsh)
+  local -a targets=()
   while IFS= read -r line; do
     [ -n "$line" ] && targets+=("$line")
   done < <( printf '%s\n' "$targets_text" | sed -E '/^[[:space:]]*$/d' )
 
-  echo -e "\033[33mThe following resources will be deleted:\033[0m"
-  # Wide preview first; fallback to names
+  echo -e "${YEL}The following resources will be deleted:${RST}"
   if ! KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" get "${targets[@]}" -o wide 2>/dev/null; then
     printf '%s\n' "${targets[@]}"
   fi
-  echo -e "\033[33m----------------------------------------\nDelete preview complete\n----------------------------------------\033[0m"
+  echo -e "${YEL}----------------------------------------\nDelete preview complete\n----------------------------------------${RST}"
 
-  echo -n -e "\033[32mDelete resources? (y/N): \033[0m"
+  echo -n -e "${GRN}Delete resources? (y/N): ${RST}"
   read -r confirm
   case "$confirm" in
-    y|Y) KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" delete "$@" ;;
-    *)   echo -e "\033[31mAborted.\033[0m"; return 1 ;;
+    y|Y) KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" delete "$@"; return $? ;;
+    *)   echo -e "${RED}Aborted.${RST}"; return 1 ;;
   esac
 }
 
-# ---------- Completion reuse for kapply/kdelete ----------
+# ---------- (zsh only) Completion reuse for kapply/kdelete ----------
 # Reuse oh-my-zsh kubectl completer if it's loaded.
 if typeset -f _kubectl >/dev/null; then
-  # kapply → behave like: kubectl apply …
   _kapply() {
     local -a _orig; _orig=("${words[@]}")
     local _cur=$CURRENT
@@ -290,7 +336,6 @@ if typeset -f _kubectl >/dev/null; then
   }
   compdef _kapply kapply
 
-  # kdelete → behave like: kubectl delete …
   _kdelete() {
     local -a _orig; _orig=("${words[@]}")
     local _cur=$CURRENT
@@ -300,27 +345,5 @@ if typeset -f _kubectl >/dev/null; then
     words=("${_orig[@]}"); CURRENT=$_cur
   }
   compdef _kdelete kdelete
-
-  # Ensure kubectl itself is bound (harmless if already set)
   compdef _kubectl kubectl
 fi
-
-
-# https://istio.io/latest/docs/ops/diagnostic-tools/istioctl/#istioctl-auto-completion
-# if type brew &>/dev/null; then
-#   FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
-
-#   autoload -Uz compinit
-#   compinit
-# fi
-
-# Get the aliases and functions for Kurly Kubernetes Config
-# [[ ! -f ~/.zshrc.kurly ]] || source ~/.zshrc.kurly
-
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=(/Users/raphael/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
