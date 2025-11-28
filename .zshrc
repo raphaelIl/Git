@@ -10,6 +10,8 @@ fi
 
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.krew/bin:$PATH"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time Oh My Zsh is loaded, in which case,
@@ -80,11 +82,14 @@ HIST_STAMPS="yyyy-mm-dd"
 plugins=(
   git
   zsh-autosuggestions
-  zsh-syntax-highlighting
   fzf
   kubectl
   kube-ps1
+  zsh-syntax-highlighting
 )
+
+# Docker completion fpath (must be before oh-my-zsh.sh to avoid double compinit)
+fpath=(/Users/raphaelil/.docker/completions $fpath)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -125,225 +130,41 @@ alias e='exit'
 alias c='clear'
 alias tf='terraform'
 alias saml='saml2aws login --force --skip-prompt --mfa-token=$1'
-# export KUBE_EDITOR=/opt/homebrew/bin/code
+
 # AutoComplete argo-rollout
-source <(kubectl-argo-rollouts completion zsh)
+if [ -f ~/.kubectl-argo-rollouts.completion.zsh ]; then
+  source ~/.kubectl-argo-rollouts.completion.zsh
+else
+  source <(kubectl-argo-rollouts completion zsh)
+fi
 alias kar='kubectl-argo-rollouts'
 
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=(/Users/raphaelil/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-
-# Node.js
-export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
-
-# local bin
-export PATH="$HOME/.local/bin:$PATH"
-
 # saml2aws
-eval "$(saml2aws --completion-script-zsh)"
+if [ -f ~/.saml2aws.completion.zsh ]; then
+  source ~/.saml2aws.completion.zsh
+else
+  saml2aws --completion-script-zsh > ~/.saml2aws.completion.zsh
+  source ~/.saml2aws.completion.zsh
+fi
 
 # aws
 complete -C '$(which aws_completer)' aws
 
 # istioctl
-# source <(istioctl completion zsh)
-# source $PATHISTIO/tools/_istioctl
+# if [ -f ~/.istioctl.completion.zsh ]; then
+#   source ~/.istioctl.completion.zsh
+# else
+#   istioctl completion zsh > ~/.istioctl.completion.zsh
+#   source ~/.istioctl.completion.zsh
+# fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 ## terraform
-# eval "$(terraform -install-autocomplete)"
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terraform terraform
 
-## kubectl (wrapper + completion reuse)
-# Pretty diff / editor
-export KUBECTL_EXTERNAL_DIFF="colordiff -N -u"   # brew install colordiff
-export KUBE_EDITOR=/usr/bin/vim
-
-# Resolve real kubectl binary (prefer binary path, not alias/function)
-KUBECTL_BIN="${KUBECTL_BIN:-$(command -v kubectl)}"
-
-# ---- Color toggle (NO_COLOR / KUBECTL_NO_COLOR / FORCE) ----
-export KUBECTL_FORCE_COLOR=1
-if [ -n "${KUBECTL_FORCE_COLOR:-}" ]; then
-  RED="\033[31m"; YEL="\033[33m"; CYN="\033[36m"; GRN="\033[32m"; BLU="\033[34m"; MAG="\033[35m"; RST="\033[0m"
-elif [ -n "${NO_COLOR:-${KUBECTL_NO_COLOR:-}}" ] || ! [ -t 2 ]; then
-  RED=""; YEL=""; CYN=""; GRN=""; BLU=""; MAG=""; RST=""
-else
-  RED="\033[31m"; YEL="\033[33m"; CYN="\033[36m"; GRN="\033[32m"; BLU="\033[34m"; MAG="\033[35m"; RST="\033[0m"
-fi
-
-# Wrapper: prompt when user runs kubectl directly in interactive shell
-kubectl() {
-  # Bypass for internal calls (kapply/kdelete) or completion engine
-  if [ -n "${KUBECTL_WRAPPER_BYPASS:-}" ] || [ "$1" = "__complete" ] || [ -n "${COMP_LINE:-}" ]; then
-    command "$KUBECTL_BIN" "$@"
-    return $?
-  fi
-
-  # ---- FAST META (single kubectl call) ----
-  # All temps are local to avoid leaking into the user shell.
-  local context cluster namespace
-  local __kcfg_json __kcfg_raw
-
-  if command -v jq >/dev/null 2>&1; then
-    __kcfg_json=$(command "$KUBECTL_BIN" config view --minify -o json 2>/dev/null)
-    # Use jq to extract three fields in one go; fallback-safe (// "")
-    context=$(jq -r '.contexts[0].name // ""' <<<"$__kcfg_json")
-    cluster=$(jq -r '.contexts[0].context.cluster // ""' <<<"$__kcfg_json")
-    namespace=$(jq -r '.contexts[0].context.namespace // ""' <<<"$__kcfg_json")
-  else
-    # Fallback without jq: still single kubectl call using JSONPath
-    __kcfg_raw=$(
-      command "$KUBECTL_BIN" config view --minify \
-        -o jsonpath='{.contexts[0].context.cluster}{"\n"}{.contexts[0].context.namespace}{"\n"}{.contexts[0].name}{"\n"}' 2>/dev/null
-    )
-    # Split three lines into three locals (portable bash/zsh)
-#     IFS=$'\n' read -r cluster namespace context <<'EOF'
-# '"$__kcfg_raw"'
-# EOF
-    # 위의 히어문은 따옴표 보존 이슈가 있을 수 있으니, 문제가 되면 아래와 같이 간단히 바꿔도 됩니다:
-    IFS=$'\n' read -r cluster namespace context <<<"$__kcfg_raw"
-  fi
-
-  # Defaults and rare fallbacks
-  [ -z "$namespace" ] && namespace="default"
-  if [ -z "$context" ]; then
-    context=$(command "$KUBECTL_BIN" config current-context 2>/dev/null)
-  fi
-
-  # Header
-  echo -e "${RED}[WARNING]${RST} You are running kubectl directly." >&2
-  echo -e "${YEL}Recommended: use kapply / kdelete instead.${RST}" >&2
-  echo -e "${CYN}Current Context:${RST} $context" >&2
-  echo -e "${CYN}Cluster:${RST} $cluster" >&2
-  echo -e "${CYN}Namespace:${RST} $namespace" >&2
-
-  # Non-interactive safety: avoid blocking in CI/pipes
-  if ! [ -t 0 ] && [ -z "${KUBECTL_ASSUME_YES:-}" ]; then
-    echo -e "${RED}[DANGER]${RST} Non-interactive shell detected; refusing to prompt. Set KUBECTL_ASSUME_YES=1 to proceed." >&2
-    return 1
-  fi
-
-  # Optional override to skip prompt (CI/automation)
-  if [ -n "${KUBECTL_ASSUME_YES:-}" ]; then
-    echo -e "${MAG}[auto]${RST} KUBECTL_ASSUME_YES=1 → continuing without prompt." >&2
-    echo >&2
-    command "$KUBECTL_BIN" "$@"
-    return $?
-  fi
-
-  # Interactive prompt
-  echo -n -e "${GRN}Are you sure you want to run kubectl? (y/N): ${RST}" >&2
-  read -r confirm
-  case "$confirm" in
-    y|Y)
-      echo >&2
-      command "$KUBECTL_BIN" "$@"
-      return $?
-      ;;
-    *)
-      echo -e "${RED}Aborted.${RST}" >&2
-      return 1
-      ;;
-  esac
-}
-
-kapply() {
-  if [ -z "$1" ]; then
-    echo -e "${RED}Usage: kapply [-f <file> | -k <kustomization-dir>]${RST}"
-    return 1
-  fi
-
-  # Diff preview (kubectl exit: 0=no diff, 1=diff present, >1=error)
-  local diff_output diff_status
-  diff_output=$(KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" diff "$@" 2>&1)
-  diff_status=$?
-
-  if [ $diff_status -eq 0 ] && [ -z "$diff_output" ]; then
-    echo -e "${GRN}No changes found. Nothing to apply.${RST}"; return 0
-  elif [ $diff_status -gt 1 ]; then
-    echo -e "${RED}Error running 'kubectl diff'. See details below:${RST}"
-    echo "$diff_output"; return $diff_status
-  fi
-
-  echo "$diff_output"
-  echo -e "${YEL}----------------------------------------\nDiff checking complete\n----------------------------------------${RST}"
-
-  echo -n -e "${GRN}Apply changes? (y/N): ${RST}"
-  read -r confirm
-  case "$confirm" in
-    y|Y) KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" apply "$@"; return $? ;;
-    *)   echo -e "${RED}Aborted.${RST}"; return 1 ;;
-  esac
-}
-
-kdelete() {
-  if [ -z "$1" ]; then
-    echo -e "${RED}Usage: kdelete [-f <file> | -k <kustomization-dir> | <type[/name]> ...]${RST}"
-    return 1
-  fi
-
-  local targets_text rc
-  targets_text=$(KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" delete "$@" \
-    --dry-run=client -o name --ignore-not-found=true 2>&1)
-  rc=$?
-
-  if [ $rc -gt 0 ]; then
-    echo -e "${RED}Error preparing delete preview. See details below:${RST}"
-    echo "$targets_text"; return $rc
-  fi
-
-  if [ -z "$targets_text" ]; then
-    echo -e "${GRN}No matching resources found. Nothing to delete.${RST}"
-    return 0
-  fi
-
-  # List to array (bash/zsh)
-  local -a targets=()
-  while IFS= read -r line; do
-    [ -n "$line" ] && targets+=("$line")
-  done < <( printf '%s\n' "$targets_text" | sed -E '/^[[:space:]]*$/d' )
-
-  echo -e "${YEL}The following resources will be deleted:${RST}"
-  if ! KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" get "${targets[@]}" -o wide 2>/dev/null; then
-    printf '%s\n' "${targets[@]}"
-  fi
-  echo -e "${YEL}----------------------------------------\nDelete preview complete\n----------------------------------------${RST}"
-
-  echo -n -e "${GRN}Delete resources? (y/N): ${RST}"
-  read -r confirm
-  case "$confirm" in
-    y|Y) KUBECTL_WRAPPER_BYPASS=1 "$KUBECTL_BIN" delete "$@"; return $? ;;
-    *)   echo -e "${RED}Aborted.${RST}"; return 1 ;;
-  esac
-}
-
-# ---------- (zsh only) Completion reuse for kapply/kdelete ----------
-# Reuse oh-my-zsh kubectl completer if it's loaded.
-if typeset -f _kubectl >/dev/null; then
-  _kapply() {
-    local -a _orig; _orig=("${words[@]}")
-    local _cur=$CURRENT
-    words=(kubectl apply "${_orig[2,-1]}")
-    CURRENT=$(( _cur + 1 ))
-    _kubectl
-    words=("${_orig[@]}"); CURRENT=$_cur
-  }
-  compdef _kapply kapply
-
-  _kdelete() {
-    local -a _orig; _orig=("${words[@]}")
-    local _cur=$CURRENT
-    words=(kubectl delete "${_orig[2,-1]}")
-    CURRENT=$(( _cur + 1 ))
-    _kubectl
-    words=("${_orig[@]}"); CURRENT=$_cur
-  }
-  compdef _kdelete kdelete
-  compdef _kubectl kubectl
-fi
+# kubectl wrapper functions and configurations are loaded from:
+# ~/.oh-my-zsh/custom/kubectl_wrapper.zsh
+# (Oh My Zsh automatically loads files in the custom directory)
